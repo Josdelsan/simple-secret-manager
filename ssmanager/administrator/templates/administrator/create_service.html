@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+
+{% block extrahead %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <center>
+        <h2>Create service an secrets</h2>
+    </center>
+    <div class="col-8 align-self-center">
+        <form method="POST">
+            {% csrf_token %}
+            {% if login_form.errors %}
+            <div class="alert alert-danger">
+                {{ login_form.errors }}
+            </div>
+            {% endif %}
+            <div class="row form-outline mb-4">
+                <label for="id_sym_key" class="form-label">Pub Key :</label>
+                <div class="form-control-lg"> {{ service_form.pub_key }} </div>
+                <label>Generate a 1024bit RSA key pair, complete with the public key and keep the private key to query for later use</label>
+            </div>
+
+            <div class="row form-outline mb-4">
+                <label for="id_sym_key" class="form-label">Sym Key :</label>
+                <div class="form-control-lg"> {{ service_form.sym_key }} </div>
+                <label>complete with an AES key, must be able to be encodec in base64</label>
+            </div>
+
+            <div class="row form-outline mb-4">
+                <label for="id_sym_key" class="form-label">Secrets :</label>
+                <div class="form-control-lg"> {{ service_form.secrets_list }} </div>
+                <label>Example: [{"name":"secret_1","value":"value_1"},{"name":"secret_2","value":"value_2"},...{"name":"secret_n","value":"value_n"}]</label>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-secondary btn-lg col-10" type="submit">Create service and secrets</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

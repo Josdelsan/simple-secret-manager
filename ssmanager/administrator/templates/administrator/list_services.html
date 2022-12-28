@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% csrf_token %}
+<label for="pub-key" class="col-sm-10 col-form-label">If you want to decrypt secrets from an specific service, enter the private service key here and press the button below</label>
+<input class="form-control form-control-lg" type="text" placeholder="private rsa key" id="pub-key">
+
+<br>
+
+<div class="container justify" style="width: 90%; overflow-x:auto;">
+    <table class="table align-middle mb-0 bg-white">
+        <thead class="bg-light">
+          <tr>
+            <th>Service id</th>
+            <th></th>
+            <th>Encrypted Sym key</th>
+            <th>Encripted Uid</th>
+          </tr>
+        </thead>
+        <tbody id="myTable">
+          {% for service in services %}
+            <tr>
+                <td>
+                    <p class="fw-bold mb-1">{{ service.id }}</p>
+                </td>
+                <td>
+                    <button onclick="requestSecrects({{ service.id }});" type="button" class="btn btn-primary btn-sm btn-rounded" id="decrypted-secrets-{{service.id}}">
+                      Decrypted secrets
+                    </button>
+                  </td>
+                <td>
+                    <p class="fw-bold mb-1">{{ service.sym_key }}</p>
+                </td>
+                <td>
+                    <p class="fw-bold mb-1">{{ service.uid }}</p>
+                </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-12">
+        <iframe id="response" width="100%" height="100%">
+        </iframe>
+    </div>
+   
+
+    <script>
+        function requestSecrects(id){
+            var pubKey = document.getElementById("pub-key").value;
+            var currentUrl = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
+
+            var data = new FormData();
+            data.append("priv_key", String(pubKey));
+            data.append("service_id", String(id) );
+
+            var xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
+
+            xhr.addEventListener("readystatechange", function() {
+                if(this.readyState === 4) {
+                    var response = document.getElementById("response");
+                    response.srcdoc = this.responseText;
+                }
+                });
+
+                xhr.open("POST", currentUrl+"/api/secrets/list");
+                xhr.setRequestHeader("X-CSRFToken",getCookie("csrftoken"));
+                xhr.send(data);
+            }
+
+        // Copiado de https://www.w3schools.com/js/js_cookies.asp
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i = 0; i <ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+		return "";
+	  }
+    </script>
+    
+{% endblock %}
