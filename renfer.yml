@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: deploy ssmanager
+    env: python
+    buildCommand: "./build_render.sh"
+    startCommand: "gunicorn deploy_renderer.wsgi:application"
